@@ -14,8 +14,8 @@ const jobSchema = new mongoose.Schema(
         },
         customerName: {
             type: String,
-            required: [true, 'Customer name is required'],
             trim: true,
+            default: 'Guest',
         },
         files: [
             {
@@ -53,8 +53,20 @@ const jobSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            enum: ['pending', 'printing', 'done', 'cancelled'],
-            default: 'pending',
+            enum: ['uploaded', 'viewed', 'printing', 'ready', 'collected', 'expired'],
+            default: 'uploaded',
+        },
+        viewedAt: {
+            type: Date,
+        },
+        printingAt: {
+            type: Date,
+        },
+        readyAt: {
+            type: Date,
+        },
+        collectedAt: {
+            type: Date,
         },
         expiresAt: {
             type: Date,

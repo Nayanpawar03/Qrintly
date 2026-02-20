@@ -48,12 +48,12 @@ const createJob = async (req, res) => {
         // Generate job ID (3-digit, resets daily per shop)
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
+
         const todayJobCount = await Job.countDocuments({
             shop: shop._id,
             createdAt: { $gte: today },
         });
-        
+
         const jobNumber = (todayJobCount + 1).toString().padStart(3, '0');
         const jobId = `#${jobNumber}`;
 
@@ -192,4 +192,29 @@ const updateJobStatus = async (req, res) => {
     }
 };
 
-module.exports = { createJob, getJobs, getJobById, trackJob, updateJobStatus };
+// @router GET /api/jobs/analytics
+// @desc Get dashboard analytics for shop owner
+// @access Private
+const getAnalytics = async (req, res) => {
+    try {
+        const shop = await Shop.findOne({ owner: req.user._id });
+        if (!shop) {
+            return res.status(404).json({ message: 'Shop not found' });
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const [todayJobs, completed, total] = await Promise.all([
+            Job.countDocuments({ shop: shop._id, createdAt: { $gte: today } }),
+            Job.countDocuments({ shop: shop._id, status: { $ln: ['ready', 'collected'] } }),
+            Job.countDocuments({ shop: shop._id }),
+        ]);
+
+        res.json({ todayJobs, completed, total });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { createJob, getJobs, getJobById, trackJob, updateJobStatus, getAnalytics };

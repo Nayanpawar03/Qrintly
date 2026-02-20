@@ -6,6 +6,7 @@ const {
     getJobById,
     trackJob,
     updateJobStatus,
+    getAnalytics,
 } = require('../controllers/jobController');
 const { protect } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
@@ -16,6 +17,7 @@ router.get('/track/:jobId', trackJob);
 
 // Private routes (shop owner)
 router.get('/', protect, getJobs);
+router.get('/analytics', protect, getAnalytics);
 router.get('/:jobId', protect, getJobById);
 router.patch('/:jobId/status', protect, updateJobStatus);
 

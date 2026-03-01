@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+    /* Brand Colors */
+    --color-brand: #5B5FEF;
+    --color-brand-light: #818CF8;
+    --color-brand-dark: #4338CA;
+
+    /* Accent (CTA / Success) */
+    --color-accent: #34D399;
+    --color-accent-hover: #2AB888;
+    --color-accent-dark: #059669;
+
+    /* Warning & Danger */
+    --color-warning: #F59E0B;
+    --color-danger: #EF4444;
+
+    /* Font */
+    --font-sans: 'Inter', sans-serif;
+
+    /* Border Radius */
+    --radius-input: 12px;
+    --radius-button: 12px;
+    --radius-card: 16px;
+}

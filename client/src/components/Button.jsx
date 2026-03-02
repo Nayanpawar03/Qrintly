@@ -1,6 +1,6 @@
 const variants = {
     primary:
-        'bg-accent text-white hover:bg-accent-hover active:scale-[0.98] shadow-sm',
+        'bg-accent-hover text-white hover:bg-accent active:scale-[0.98] shadow-sm',
     outline:
         'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700',
 };

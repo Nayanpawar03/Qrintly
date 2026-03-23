@@ -25,3 +25,11 @@
     --radius-button: 12px;
     --radius-card: 16px;
 }
+
+button {
+    cursor: pointer;
+  }
+  
+  button:disabled {
+    cursor: not-allowed;
+  }

@@ -19,8 +19,12 @@ const createShop = async (req, res) => {
         // Generate unique shop ID
         const shopId = `shop_${nanoid(8)}`;
 
-        // Generate QR Code (Points to customer upload page) 
-        const uploadUrl = `${process.env.CLIENT_URL}/upload/${shopId}`;
+        // Generate QR Code (Points to customer upload page)
+        const clientUrl = (process.env.CLIENT_URL || 'http://localhost:5173').replace(
+            /\/$/,
+            ''
+        );
+        const uploadUrl = `${clientUrl}/upload/${shopId}`;
         const qrCodeUrl = await QRCode.toDataURL(uploadUrl);
 
         // Create shop
@@ -75,4 +79,26 @@ const getShopByShopId = async (req, res) => {
     }
 };
 
-module.exports = { createShop, getMyShop, getShopByShopId };
+// @route PATCH /api/shops/settings
+// @desc Update shop settings (autoDeleteHours)
+// @access Private
+const updateShopSettings = async (req, res) => {
+    try {
+      const { autoDeleteHours } = req.body;
+  
+      const shop = await Shop.findOne({ owner: req.user._id });
+      if (!shop) {
+        return res.status(404).json({ message: 'Shop not found' });
+      }
+  
+      shop.settings = shop.settings || {};
+      shop.settings.autoDeleteHours = Number(autoDeleteHours) || 24;
+      await shop.save();
+  
+      res.json(shop);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+
+module.exports = { createShop, getMyShop, getShopByShopId, updateShopSettings };

@@ -207,7 +207,7 @@ const getAnalytics = async (req, res) => {
 
         const [todayJobs, completed, total] = await Promise.all([
             Job.countDocuments({ shop: shop._id, createdAt: { $gte: today } }),
-            Job.countDocuments({ shop: shop._id, status: { $ln: ['ready', 'collected'] } }),
+            Job.countDocuments({ shop: shop._id, status: { $in: ['ready', 'collected'] } }),
             Job.countDocuments({ shop: shop._id }),
         ]);
 

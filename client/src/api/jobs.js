@@ -6,8 +6,8 @@ export const uploadJob = (shopId, formData) =>
     });
 
 export const getJobs = () => API.get('/jobs');
-export const getJobById = (jobId) => API.get(`/jobs/${jobId}`);
-export const trackJob = (jobId) => API.get(`/jobs/track/${jobId}`);
+export const getJobById = (jobId) => API.get(`/jobs/${encodeURIComponent(jobId)}`);
+export const trackJob = (jobId) => API.get(`/jobs/track/${encodeURIComponent(jobId)}`);
 export const updateJobStatus = (jobId, status) =>
-    API.patch(`/jobs/${jobId}/status`, { status });
+    API.patch(`/jobs/${encodeURIComponent(jobId)}/status`, { status });
 export const getAnalytics = () => API.get('/jobs/analytics');

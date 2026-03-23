@@ -2,11 +2,14 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
-const { register, login } = require('../controllers/authController');
+const { protect } = require('../middleware/authMiddleware');
+const { register, login, updateProfile, updatePassword} = require('../controllers/authController');
 
 // Email-Password routes
 router.post('/register', register);
 router.post('/login', login);
+router.patch('/profile', protect, updateProfile);
+router.patch('/password', protect, updatePassword);
 
 // Google OAuth routes
 router.get(

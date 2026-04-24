@@ -26,6 +26,10 @@ const shopSchema = new mongoose.Schema(
                 default: 24,
             },
         },
+        jobCounter: {
+            type: Number,
+            default: 0,
+        },
     },
     {
         timestamps: true,

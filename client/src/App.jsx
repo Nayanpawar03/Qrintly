@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ProfilePage from './pages/ProfilePage';
 import GenerateQrPage from './pages/GenerateQrPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
+import UploadPage from './pages/UploadPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
+      <Route path='/upload/:shopId' element={<UploadPage />} />
 
       <Route
         path="/dashboard"

@@ -3,10 +3,15 @@ const Shop = require('../models/Shop');
 const cloudinary = require('../config/cloudinary');
 
 // Helper : Upload file buffer to Cloudinary
-const uploadToCloudinary = (fileBuffer, folder) => {
+const uploadToCloudinary = (fileBuffer, folder, filename) => {
     return new Promise((resolve, reject) => {
+        // Determine resource type based on file extension
+        const ext = filename.split('.').pop().toLowerCase();
+        const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'];
+        const resourceType = imageExts.includes(ext) ? 'image' : 'raw';
+
         cloudinary.uploader
-            .upload_stream({ folder, resource_type: 'auto' }, (error, result) => {
+            .upload_stream({ folder, resource_type: resourceType }, (error, result) => {
                 if (error) reject(error);
                 else resolve(result);
             })
@@ -36,7 +41,7 @@ const createJob = async (req, res) => {
         // Upload files to Cloudinary 
         const uploadedFiles = [];
         for (const file of req.files) {
-            const result = await uploadToCloudinary(file.buffer, `qrintly/${shopId}`);
+            const result = await uploadToCloudinary(file.buffer, `qrintly/${shopId}`, file.originalname);
             uploadedFiles.push({
                 originalName: file.originalname,
                 url: result.secure_url,
@@ -45,17 +50,12 @@ const createJob = async (req, res) => {
             });
         }
 
-        // Generate job ID (3-digit, resets daily per shop)
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const todayJobCount = await Job.countDocuments({
-            shop: shop._id,
-            createdAt: { $gte: today },
-        });
-
-        const jobNumber = (todayJobCount + 1).toString().padStart(3, '0');
-        const jobId = `#${jobNumber}`;
+        // Generate unique 4-digit random job ID
+        let jobId;
+        do {
+            const rand = Math.floor(1000 + Math.random() * 9000); // 1000–9999
+            jobId = `#${rand}`;
+        } while (await Job.exists({ jobId, shop: shop._id }));
 
         // Calculate expiry time
         const expiresAt = new Date();

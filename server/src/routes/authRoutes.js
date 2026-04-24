@@ -3,13 +3,17 @@ const router = express.Router();
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const { protect } = require('../middleware/authMiddleware');
-const { register, login, updateProfile, updatePassword} = require('../controllers/authController');
+const { register, login, updateProfile, updatePassword } = require('../controllers/authController');
 
 // Email-Password routes
 router.post('/register', register);
 router.post('/login', login);
 router.patch('/profile', protect, updateProfile);
 router.patch('/password', protect, updatePassword);
+router.get('/me', protect, (req, res) => {
+    const u = req.user;
+    res.json({ _id: u._id, name: u.name, email: u.email, phone: u.phone });
+});
 
 // Google OAuth routes
 router.get(

@@ -5,16 +5,18 @@ import DashboardPage from './pages/DashboardPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProfilePage from './pages/ProfilePage';
 import GenerateQrPage from './pages/GenerateQrPage';
+import AuthCallbackPage from './pages/AuthCallbackPage';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      
+
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
-      <Route 
+      <Route
         path="/dashboard"
         element={
           <ProtectedRoute>

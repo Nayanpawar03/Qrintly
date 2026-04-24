@@ -117,7 +117,7 @@ function UploadPage() {
                                 Choose files or drag & drop here
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                                PDF, DOC, JPG supported
+                                PDF, DOC, JPG supported · Max 5 files · 10MB each
                             </p>
                             <input
                                 type="file"
@@ -125,7 +125,10 @@ function UploadPage() {
                                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                                 onChange={(e) => {
                                     const selected = Array.from(e.target.files);
-                                    setFiles((prev) => [...prev, ...selected]);
+                                    setFiles((prev) => {
+                                        const combined = [...prev, ...selected];
+                                        return combined.slice(0, 5);
+                                    });
                                 }}
                                 className="hidden"
                                 id="file-input"

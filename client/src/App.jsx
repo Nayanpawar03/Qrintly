@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
@@ -8,16 +8,16 @@ import GenerateQrPage from './pages/GenerateQrPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import UploadPage from './pages/UploadPage';
 import TrackJobPage from './pages/TrackJobPage';
+import LandingPage from './pages/LandingPage';
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
-      <Route path='/upload/:shopId' element={<UploadPage />} />
+      <Route path="/upload/:shopId" element={<UploadPage />} />
       <Route path="/track/:jobId" element={<TrackJobPage />} />
 
 

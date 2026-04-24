@@ -14,7 +14,7 @@ const { protect } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
 
 // Public routes
-router.post('/:shopId', upload.array('files', 10), createJob);
+router.post('/:shopId', upload.array('files', 5), createJob);
 router.get('/track/:jobId', trackJob);
 
 // PDF proxy — streams Cloudinary file with correct headers for browser rendering

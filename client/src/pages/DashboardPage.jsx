@@ -14,8 +14,10 @@ import {
 } from 'lucide-react';
 import { getJobs, getAnalytics, updateJobStatus, clearCompleted } from '../api/jobs';
 import { getMyShop } from '../api/shops';
+import { useAuth } from '../context/AuthContext';
 
 function DashboardPage() {
+  const { logout } = useAuth();
   const [jobs, setJobs] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [shopSettings, setShopSettings] = useState(null);
@@ -24,6 +26,7 @@ function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedJob, setSelectedJob] = useState(null);
 
   const statusBadgeClasses = {
     success: 'bg-emerald-50 text-emerald-700',
@@ -185,16 +188,12 @@ function DashboardPage() {
       setJobs((prev) =>
         prev.map((job) => (job.jobId === updated.jobId ? updated : job))
       );
-
-      // Print each file
-      const filesToPrint = updated.files || [];
-      for (const file of filesToPrint) {
-        await printFile(file.url, file.originalName);
-      }
+      setSelectedJob(updated);
     } catch (err) {
       console.error(err);
     }
   };
+
 
   const printFile = (url, name = '') => {
     return new Promise((resolve) => {
@@ -336,7 +335,7 @@ function DashboardPage() {
 
         {/* Logout */}
         <div className="border-t border-gray-100 dark:border-gray-800 px-4 py-4">
-          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <button onClick={logout} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
             <LogOut className="w-4 h-4" />
             <span>Logout</span>
           </button>
@@ -570,6 +569,92 @@ function DashboardPage() {
           </section>
         </div>
       </main>
+      {/* ===== JOB DETAIL MODAL ===== */}
+      {selectedJob && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+          <div className="w-full max-w-lg bg-white dark:bg-gray-900 rounded-2xl shadow-xl overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+              <div>
+                <p className="text-xs text-gray-400 dark:text-gray-500">Job ID</p>
+                <p className="text-lg font-bold text-gray-900 dark:text-white">{selectedJob.jobId}</p>
+              </div>
+              <button
+                onClick={() => setSelectedJob(null)}
+                className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-xl font-light"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Job info */}
+            <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 grid grid-cols-2 gap-3 text-xs">
+              <div>
+                <p className="text-gray-400 dark:text-gray-500 mb-0.5">Customer</p>
+                <p className="font-medium text-gray-900 dark:text-white">{selectedJob.customerName}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 dark:text-gray-500 mb-0.5">Copies</p>
+                <p className="font-medium text-gray-900 dark:text-white">{selectedJob.preferences?.copies}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 dark:text-gray-500 mb-0.5">Page Size</p>
+                <p className="font-medium text-gray-900 dark:text-white">{selectedJob.preferences?.pageSize}</p>
+              </div>
+              <div>
+                <p className="text-gray-400 dark:text-gray-500 mb-0.5">Color</p>
+                <p className="font-medium text-gray-900 dark:text-white capitalize">
+                  {selectedJob.preferences?.color === 'bw' ? 'Black & White' : 'Color'}
+                </p>
+              </div>
+              <div>
+                <p className="text-gray-400 dark:text-gray-500 mb-0.5">Sided</p>
+                <p className="font-medium text-gray-900 dark:text-white capitalize">{selectedJob.preferences?.sided}</p>
+              </div>
+            </div>
+
+            {/* Files list */}
+            <div className="px-6 py-4 max-h-64 overflow-y-auto">
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3">
+                Files ({selectedJob.files?.length || 0})
+              </p>
+              <div className="space-y-2">
+                {(selectedJob.files || []).map((file, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-3"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center shrink-0">
+                        <Printer className="w-4 h-4 text-brand" />
+                      </div>
+                      <p className="text-xs text-gray-700 dark:text-gray-200 truncate">{file.originalName}</p>
+                    </div>
+                    <button
+                      onClick={() => printFile(file.url, file.originalName)}
+                      className="ml-3 shrink-0 inline-flex items-center gap-1.5 rounded-full bg-emerald-500 text-white px-3 py-1.5 text-[11px] font-medium hover:bg-emerald-600"
+                    >
+                      <Printer className="w-3 h-3" />
+                      Print
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+              <button
+                onClick={() => setSelectedJob(null)}
+                className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

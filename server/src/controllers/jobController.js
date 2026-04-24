@@ -25,7 +25,7 @@ const uploadToCloudinary = (fileBuffer, folder, filename) => {
 const createJob = async (req, res) => {
     try {
         const { shopId } = req.params;
-        const { customerName, copies, color, pageSize, sided, notes } = req.body;
+        const { customerName, copies, color, pageSize, sided } = req.body;
 
         // Find the shop
         const shop = await Shop.findOne({ shopId });
@@ -57,9 +57,8 @@ const createJob = async (req, res) => {
             jobId = `#${rand}`;
         } while (await Job.exists({ jobId, shop: shop._id }));
 
-        // Calculate expiry time
-        const expiresAt = new Date();
-        expiresAt.setHours(expiresAt.getHours() + shop.settings.autoDeleteHours);
+        // Calculate expiry time (using milliseconds to support fractional hours)
+        const expiresAt = new Date(Date.now() + shop.settings.autoDeleteHours * 60 * 60 * 1000);
 
         // Create Job
         const job = await Job.create({
@@ -73,7 +72,6 @@ const createJob = async (req, res) => {
                 pageSize: pageSize || 'A4',
                 sided: sided || 'single',
             },
-            notes,
             expiresAt,
         });
 
@@ -163,7 +161,7 @@ const updateJobStatus = async (req, res) => {
         const { status } = req.body;
         const { jobId } = req.params;
 
-        const validStatuses = ['printing', 'ready', 'collected'];
+        const validStatuses = ['printing', 'ready'];
         if (!validStatuses.includes(status)) {
             return res.status(400).json({ message: 'Invalid status' });
         }
@@ -182,9 +180,24 @@ const updateJobStatus = async (req, res) => {
         job.status = status;
         if (status === 'printing') job.printingAt = new Date();
         if (status === 'ready') job.readyAt = new Date();
-        if (status === 'collected') job.collectedAt = new Date();
 
         await job.save();
+
+        // Auto-advance: printing → ready after 60s → expired after 30s
+        if (status === 'printing') {
+            setTimeout(async () => {
+                try {
+                    const j = await Job.findOne({ jobId, shop: shop._id });
+                    if (j && j.status === 'printing') {
+                        j.status = 'ready';
+                        j.readyAt = new Date();
+                        await j.save();
+                    }
+                } catch (err) {
+                    console.error('Auto-ready error:', err.message);
+                }
+            }, 60 * 1000);
+        }
 
         res.json(job);
     } catch (error) {
@@ -217,4 +230,19 @@ const getAnalytics = async (req, res) => {
     }
 };
 
-module.exports = { createJob, getJobs, getJobById, trackJob, updateJobStatus, getAnalytics };
+// @route DELETE /api/jobs/completed
+// @desc Delete all expired/ready jobs for the shop
+// @access Private
+const clearCompleted = async (req, res) => {
+    try {
+        const shop = await Shop.findOne({ owner: req.user._id });
+        if (!shop) return res.status(404).json({ message: 'Shop not found' });
+
+        await Job.deleteMany({ shop: shop._id, status: { $in: ['ready', 'expired'] } });
+        res.json({ message: 'Completed jobs cleared' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { createJob, getJobs, getJobById, trackJob, updateJobStatus, getAnalytics, clearCompleted };

@@ -20,7 +20,6 @@ function UploadPage() {
         color: 'bw',
         pageSize: 'A4',
         sided: 'single',
-        notes: '',
     });
 
     const [submitting, setSubmitting] = useState(false);
@@ -49,7 +48,6 @@ function UploadPage() {
             formData.append('color', form.color);
             formData.append('pageSize', form.pageSize);
             formData.append('sided', form.sided);
-            formData.append('notes', form.notes);
 
             const res = await uploadJob(shopId, formData);
             navigate(`/track/${encodeURIComponent(res.data.jobId)}`);
@@ -297,20 +295,6 @@ function UploadPage() {
                                             </button>
                                         ))}
                                     </div>
-                                </div>
-
-                                {/* Notes */}
-                                <div>
-                                    <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1.5">
-                                        Additional Notes (Optional)
-                                    </label>
-                                    <textarea
-                                        rows={4}
-                                        placeholder="Any special instructions..."
-                                        value={form.notes}
-                                        onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                                        className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand/25 focus:border-brand resize-none"
-                                    />
                                 </div>
                             </div>
                         </div>

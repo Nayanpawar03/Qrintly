@@ -12,7 +12,7 @@ import {
   Settings,
   Star,
 } from 'lucide-react';
-import { getJobs, getAnalytics, updateJobStatus } from '../api/jobs';
+import { getJobs, getAnalytics, updateJobStatus, clearCompleted } from '../api/jobs';
 import { getMyShop } from '../api/shops';
 
 function DashboardPage() {
@@ -80,7 +80,10 @@ function DashboardPage() {
 
   useEffect(() => {
     fetchDashboardData();
+    const interval = setInterval(fetchDashboardData, 8000);
+    return () => clearInterval(interval);
   }, []);
+
 
   const statCards = useMemo(() => {
     const todayJobs = analytics?.todayJobs ?? 0;
@@ -166,7 +169,6 @@ function DashboardPage() {
   const getStatusVariant = (status) => {
     switch (status) {
       case 'ready':
-      case 'collected':
         return 'success';
       case 'viewed':
       case 'printing':
@@ -255,6 +257,15 @@ function DashboardPage() {
 
   const handleStatusFilterChange = (value) => {
     setStatusFilter(value);
+  };
+
+  const handleClearCompleted = async () => {
+    try {
+      await clearCompleted();
+      setJobs((prev) => prev.filter((j) => j.status !== 'ready' && j.status !== 'expired'));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleAutoDeleteChange = (value) => {
@@ -436,7 +447,7 @@ function DashboardPage() {
                   <ChevronDown className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400" />
                 </div>
 
-                <button className="inline-flex items-center rounded-full bg-rose-50 text-rose-600 px-3 py-1.5 text-xs font-medium border border-rose-100 hover:bg-rose-100">
+                <button className="inline-flex items-center rounded-full bg-rose-50 text-rose-600 px-3 py-1.5 text-xs font-medium border border-rose-100 hover:bg-rose-100" onClick={handleClearCompleted}>
                   Clear All Completed
                 </button>
               </div>
@@ -535,13 +546,20 @@ function DashboardPage() {
                           {formatExpiresIn(job.expiresAt)}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-center">
-                          <button
-                            onClick={() => handlePrintClick(job.jobId)}
-                            className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500 text-white px-4 py-1.5 text-[11px] font-medium hover:bg-emerald-600 mx-auto"
-                          >
-                            <Printer className="w-3.5 h-3.5" />
-                            Print
-                          </button>
+                          {job.status === 'ready' || job.status === 'expired' ? (
+                            <span className={`text-xs font-medium ${job.status === 'ready' ? 'text-emerald-500' : 'text-gray-400'}`}>
+                              {job.status === 'ready' ? '✓ Ready' : 'Expired'}
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => handlePrintClick(job.jobId)}
+                              disabled={job.status === 'printing'}
+                              className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500 text-white px-4 py-1.5 text-[11px] font-medium hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed mx-auto"
+                            >
+                              <Printer className="w-3.5 h-3.5" />
+                              {job.status === 'printing' ? 'Printing...' : 'Print'}
+                            </button>
+                          )}
                         </td>
                       </tr>
                     );

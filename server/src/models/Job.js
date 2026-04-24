@@ -47,13 +47,9 @@ const jobSchema = new mongoose.Schema(
                 default: 'single',
             },
         },
-        notes: {
-            type: String,
-            trim: true,
-        },
         status: {
             type: String,
-            enum: ['uploaded', 'viewed', 'printing', 'ready', 'collected', 'expired'],
+            enum: ['uploaded', 'viewed', 'printing', 'ready', 'expired'],
             default: 'uploaded',
         },
         viewedAt: {
@@ -63,9 +59,6 @@ const jobSchema = new mongoose.Schema(
             type: Date,
         },
         readyAt: {
-            type: Date,
-        },
-        collectedAt: {
             type: Date,
         },
         expiresAt: {

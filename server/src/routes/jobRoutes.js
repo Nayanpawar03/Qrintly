@@ -8,6 +8,7 @@ const {
     trackJob,
     updateJobStatus,
     getAnalytics,
+    clearCompleted,
 } = require('../controllers/jobController');
 const { protect } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
@@ -33,6 +34,7 @@ router.get('/proxy', protect, (req, res) => {
 // Private routes (shop owner)
 router.get('/', protect, getJobs);
 router.get('/analytics', protect, getAnalytics);
+router.delete('/completed', protect, clearCompleted);
 router.get('/:jobId', protect, getJobById);
 router.patch('/:jobId/status', protect, updateJobStatus);
 

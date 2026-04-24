@@ -7,6 +7,7 @@ import ProfilePage from './pages/ProfilePage';
 import GenerateQrPage from './pages/GenerateQrPage';
 import AuthCallbackPage from './pages/AuthCallbackPage';
 import UploadPage from './pages/UploadPage';
+import TrackJobPage from './pages/TrackJobPage';
 
 function App() {
   return (
@@ -17,6 +18,8 @@ function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route path='/upload/:shopId' element={<UploadPage />} />
+      <Route path="/track/:jobId" element={<TrackJobPage />} />
+
 
       <Route
         path="/dashboard"

@@ -11,3 +11,4 @@ export const trackJob = (jobId) => API.get(`/jobs/track/${encodeURIComponent(job
 export const updateJobStatus = (jobId, status) =>
     API.patch(`/jobs/${encodeURIComponent(jobId)}/status`, { status });
 export const getAnalytics = () => API.get('/jobs/analytics');
+export const clearCompleted = () => API.delete('/jobs/completed');

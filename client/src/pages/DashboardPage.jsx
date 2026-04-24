@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Bell,
   ChevronDown,
@@ -18,6 +18,7 @@ import { useAuth } from '../context/AuthContext';
 
 function DashboardPage() {
   const { logout } = useAuth();
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [shopSettings, setShopSettings] = useState(null);
@@ -302,19 +303,19 @@ function DashboardPage() {
             <Layers className="w-4 h-4" />
             <span>Dashboard</span>
           </button>
-          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <button onClick={() => navigate('/')} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
             <Home className="w-4 h-4" />
             <span>Home</span>
           </button>
-          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <button onClick={() => navigate('/pricing')} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
             <Star className="w-4 h-4" />
             <span>My Plans</span>
           </button>
-          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <button onClick={() => navigate('/profile')} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
             <Settings className="w-4 h-4" />
             <span>Settings</span>
           </button>
-          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <button onClick={() => navigate('/security')} className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
             <HelpCircle className="w-4 h-4" />
             <span>Support</span>
           </button>

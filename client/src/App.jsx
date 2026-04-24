@@ -9,6 +9,7 @@ import AuthCallbackPage from './pages/AuthCallbackPage';
 import UploadPage from './pages/UploadPage';
 import TrackJobPage from './pages/TrackJobPage';
 import LandingPage from './pages/LandingPage';
+import SecurityPage from './pages/SecurityPage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route path="/upload/:shopId" element={<UploadPage />} />
       <Route path="/track/:jobId" element={<TrackJobPage />} />
+      <Route path="/security" element={<SecurityPage />} />
 
 
       <Route

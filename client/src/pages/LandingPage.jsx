@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import { QrCode, Play } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 function LandingPage() {
+    const { user } = useAuth();
     return (
         <div className="min-h-screen bg-white dark:bg-gray-950 font-sans">
 
@@ -23,18 +25,29 @@ function LandingPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Link
-                            to="/login"
-                            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-brand"
-                        >
-                            Login
-                        </Link>
-                        <Link
-                            to="/register"
-                            className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-medium hover:bg-brand/90"
-                        >
-                            Get Started
-                        </Link>
+                        {user ? (
+                            <Link
+                                to="/dashboard"
+                                className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-medium hover:bg-brand/90"
+                            >
+                                Go to Dashboard
+                            </Link>
+                        ) : (
+                            <>
+                                <Link
+                                    to="/login"
+                                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-brand"
+                                >
+                                    Login
+                                </Link>
+                                <Link
+                                    to="/register"
+                                    className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-medium hover:bg-brand/90"
+                                >
+                                    Get Started
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </nav>
@@ -52,7 +65,7 @@ function LandingPage() {
                     </p>
                     <div className="flex items-center gap-3">
                         <Link
-                            to="/register"
+                            to={user ? '/generate-qr' : '/register'}
                             className="px-5 py-2.5 rounded-xl bg-brand text-white text-sm font-semibold hover:bg-brand/90"
                         >
                             Generate My QR
@@ -245,7 +258,7 @@ function LandingPage() {
                     Join print shops already using Qrintly to manage their workflow.
                 </p>
                 <Link
-                    to="/register"
+                    to={user ? '/generate-qr' : '/register'}
                     className="inline-flex items-center px-6 py-3 rounded-xl bg-white text-brand text-sm font-semibold hover:bg-gray-50"
                 >
                     Generate My QR

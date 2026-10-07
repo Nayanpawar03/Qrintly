@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { QrCode, Shield, ChevronDown } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 function SecurityPage() {
     const [openTerm, setOpenTerm] = useState(null);
+    const { user } = useAuth();
 
     return (
         <div className="min-h-screen bg-white dark:bg-gray-950 font-sans">
@@ -26,12 +28,20 @@ function SecurityPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <Link to="/login" className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-brand">
-                            Login
-                        </Link>
-                        <Link to="/register" className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-medium hover:bg-brand/90">
-                            Get Started
-                        </Link>
+                        {user ? (
+                            <Link to="/dashboard" className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-medium hover:bg-brand/90">
+                                Go to Dashboard
+                            </Link>
+                        ) : (
+                            <>
+                                <Link to="/login" className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-brand">
+                                    Login
+                                </Link>
+                                <Link to="/register" className="px-4 py-2 rounded-xl bg-brand text-white text-sm font-medium hover:bg-brand/90">
+                                    Get Started
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </div>
             </nav>

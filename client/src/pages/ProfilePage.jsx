@@ -1,11 +1,17 @@
-import { useEffect, useState } from 'react';
-import { Lock, Mail, Save, User, Clock } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Camera, Lock, Mail, Save, User, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { getMyShop } from '../api/shops';
+import { uploadAvatar, getMe } from '../api/auth';
 import API from '../api/axios';
 
 function ProfilePage() {
-  const { user, logout } = useAuth();
+  const { user, logout, setUserFromToken } = useAuth();
+  const navigate = useNavigate();
+  const fileInputRef = useRef(null);
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [form, setForm] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -40,9 +46,45 @@ function ProfilePage() {
     loadShop();
   }, []);
 
+  // Fetch fresh user data to get latest avatar
+  useEffect(() => {
+    getMe().then((res) => {
+      const freshUser = { ...res.data, token: user?.token };
+      localStorage.setItem('user', JSON.stringify(freshUser));
+      setUserFromToken(freshUser);
+      setAvatarPreview(res.data.avatar || null);
+      setForm((prev) => ({
+        ...prev,
+        name: res.data.name || '',
+        email: res.data.email || '',
+        phone: res.data.phone || '',
+      }));
+    }).catch(() => { });
+  }, []);
+
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setAvatarPreview(URL.createObjectURL(file));
+    setUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      const res = await uploadAvatar(formData);
+      const updatedUser = { ...user, avatar: res.data.avatar };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      setUserFromToken(updatedUser);
+      setMessage('Profile picture updated.');
+    } catch (err) {
+      setError('Failed to upload avatar.');
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   const handlePasswordChange = (e) => {
@@ -116,23 +158,32 @@ function ProfilePage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex">
       <main className="flex-1 px-4 sm:px-8 py-8 max-w-5xl mx-auto">
         <header className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
-              Profile
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Manage your account information and shop preferences.
-            </p>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700 flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 dark:text-white">
+                Profile
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Manage your account information and shop preferences.
+              </p>
+            </div>
           </div>
         </header>
 
         {(message || error) && (
           <div
-            className={`mb-5 rounded-lg px-4 py-3 text-sm ${
-              error
-                ? 'bg-rose-50 text-rose-700 border border-rose-100'
-                : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-            }`}
+            className={`mb-5 rounded-lg px-4 py-3 text-sm ${error
+              ? 'bg-rose-50 text-rose-700 border border-rose-100'
+              : 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+              }`}
           >
             {error || message}
           </div>
@@ -147,6 +198,38 @@ function ProfilePage() {
             </h2>
 
             <form onSubmit={handleSaveProfile} className="space-y-4">
+              {/* Avatar */}
+              <div className="flex items-center gap-4 pb-2">
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                    {avatarPreview ? (
+                      <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <User className="w-7 h-7" />
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-brand text-white flex items-center justify-center shadow"
+                  >
+                    <Camera className="w-3 h-3" />
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                  />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{uploadingAvatar ? 'Uploading...' : 'Click camera to change photo'}</p>
+                </div>
+              </div>
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Full Name
@@ -194,7 +277,7 @@ function ProfilePage() {
                 </button>
                 <button
                   type="button"
-                  onClick={logout}
+                  onClick={() => { logout(); navigate('/login'); }}
                   className="text-xs text-rose-500 hover:underline"
                 >
                   Logout

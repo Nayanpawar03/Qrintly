@@ -15,7 +15,7 @@ function PricingPage() {
             desc: 'Best for small print shops',
             features: ['1 Active Shop QR', 'Unlimited File Uploads', 'Basic Job Dashboard', 'Email Support'],
             cta: 'Get Started',
-            ctaLink: user ? '/generate-qr' : '/register',
+            ctaLink: user ? `/checkout?plan=basic&billing=${billing}` : '/register',
             highlight: false,
         },
         {
@@ -24,7 +24,7 @@ function PricingPage() {
             desc: 'Best for growing print centers',
             features: ['Up to 3 Shop QRs', 'Advanced Job Tracking', 'Priority Support', 'Basic Analytics', 'Custom Job Status'],
             cta: 'Start Pro',
-            ctaLink: user ? '/generate-qr' : '/register',
+            ctaLink: user ? `/checkout?plan=pro&billing=${billing}` : '/register',
             highlight: true,
         },
         {
@@ -32,8 +32,8 @@ function PricingPage() {
             price: billing === 'monthly' ? 1999 : 1599,
             desc: 'For multi-location print businesses',
             features: ['Unlimited Shop QRs', 'Admin Roles', 'Advanced Analytics', 'Custom Branding', 'Dedicated Support'],
-            cta: 'Contact Sales',
-            ctaLink: '/security',
+            cta: 'Get Enterprise',
+            ctaLink: user ? `/checkout?plan=enterprise&billing=${billing}` : '/register',
             highlight: false,
         },
     ];

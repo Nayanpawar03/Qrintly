@@ -2,11 +2,21 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
 const { protect } = require('../middleware/authMiddleware');
-const upload = require('../middleware/uploadMiddleware');
 const cloudinary = require('../config/cloudinary');
 const User = require('../models/User');
 const { register, login, updateProfile, updatePassword } = require('../controllers/authController');
+
+// Separate multer instance for avatar (images only, 5MB)
+const avatarUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) cb(null, true);
+        else cb(new Error('Only image files allowed'), false);
+    },
+});
 
 // Email-Password routes
 router.post('/register', register);
@@ -19,7 +29,7 @@ router.get('/me', protect, (req, res) => {
 });
 
 // Avatar upload
-router.patch('/avatar', protect, upload.single('avatar'), async (req, res) => {
+router.patch('/avatar', protect, avatarUpload.single('avatar'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
 

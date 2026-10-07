@@ -5,7 +5,7 @@ const authRoutes = require('./routes/authRoutes');
 const shopRoutes = require('./routes/shopRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
-
+const paymentRoutes = require('./routes/paymentRoutes');
 
 const app = express();
 
@@ -20,6 +20,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/shops', shopRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/payments', paymentRoutes);
 
 app.get('/health', (req, res) => {
     res.json({ status: 'Server is running' });

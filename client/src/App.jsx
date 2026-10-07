@@ -10,6 +10,7 @@ import UploadPage from './pages/UploadPage';
 import TrackJobPage from './pages/TrackJobPage';
 import LandingPage from './pages/LandingPage';
 import SecurityPage from './pages/SecurityPage';
+import CheckoutPage from './pages/CheckoutPage';
 import PricingPage from './pages/PricingPage';
 
 function App() {
@@ -23,6 +24,14 @@ function App() {
       <Route path="/track/:jobId" element={<TrackJobPage />} />
       <Route path="/security" element={<SecurityPage />} />
       <Route path="/pricing" element={<PricingPage />} />
+      <Route
+        path="/checkout"
+        element={
+          <ProtectedRoute>
+            <CheckoutPage />
+          </ProtectedRoute>
+        }
+      />
 
 
       <Route
